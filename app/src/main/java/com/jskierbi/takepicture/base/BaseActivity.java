@@ -36,6 +36,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     super.onDestroy();
   }
 
+  @Override
+  protected void onStart() {
+    super.onStart();
+    EventBus.register(this);
+  }
+
+  @Override
+  protected void onStop() {
+    EventBus.unregister(this);
+    super.onStop();
+  }
+
   private void createComponent() {
     if (activityComponent == null) {
       activityComponent = Application.get(this).activityComponent(this);
