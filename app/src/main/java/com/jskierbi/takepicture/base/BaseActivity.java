@@ -28,6 +28,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     createComponent();
     super.onCreate(savedInstanceState);
     component().inject(this);
+    inject(component());
   }
 
   @Override

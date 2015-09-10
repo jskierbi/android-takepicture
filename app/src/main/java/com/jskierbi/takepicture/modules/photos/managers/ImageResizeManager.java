@@ -19,8 +19,6 @@ import java.io.FileOutputStream;
 @ApplicationLevel
 public class ImageResizeManager {
 
-  private static final int MAX_SIZE = 300;
-
   @Inject
   @ForApplication
   Context context;
@@ -30,7 +28,8 @@ public class ImageResizeManager {
   }
 
   public Observable<Uri> resizePhoto(final Uri sourceFileUri,
-                                     final Uri targetFileUri) {
+                                     final Uri targetFileUri,
+                                     final int maxSize) {
     return Observable.create(new Observable.OnSubscribe<Uri>() {
       @Override
       public void call(Subscriber<? super Uri> subscriber) {
@@ -39,7 +38,7 @@ public class ImageResizeManager {
           bmOptions.inJustDecodeBounds = true;
           BitmapFactory.decodeFile(sourceFileUri.getPath(), bmOptions);
 
-          int scaleFactor = Math.min(bmOptions.outWidth / MAX_SIZE, bmOptions.outHeight / MAX_SIZE);
+          int scaleFactor = Math.min(bmOptions.outWidth / maxSize, bmOptions.outHeight / maxSize);
           bmOptions.inJustDecodeBounds = false;
           bmOptions.inSampleSize = scaleFactor;
 
@@ -52,8 +51,8 @@ public class ImageResizeManager {
           } finally {
             if (out != null) out.close();
           }
-          // Invalidate picasso - just in case :)
-          // This is crucial when overwriting file
+          // Invalidate picasso - just in case image was already used in application :)
+          // This is crucial when overwriting already existing file that was previously loaded by picasso
           Picasso.with(context).invalidate(targetFileUri);
           subscriber.onNext(targetFileUri);
           subscriber.onCompleted();
